@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelley Compass AI | Course Planning Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-inner">
+                <div class="logo-section">
+                    <h1 class="app-title">Kelley Compass</h1>
+                    <p class="app-subtitle">AI Course Planning Assistant</p>
+                </div>
+                <div class="header-status">
+                    <span id="apiStatus" class="status-badge">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- State 1: Landing (Drop Zone) -->
+            <div id="state-landing" class="state state-active">
+                <div class="landing-container">
+                    <!-- Drop Zone -->
+                    <div
+                        id="fileDropZone"
+                        class="file-drop-zone"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Drop transcript file here">
+                        <div class="file-drop-content">
+                            <div class="file-drop-icon">📄</div>
+                            <p class="file-drop-text">Drop Your Transcript Here</p>
+                            <p class="file-drop-hint">PDF or TXT file</p>
+                        </div>
+                        <input
+                            type="file"
+                            id="transcriptFile"
+                            accept=".pdf,.txt"
+                            style="display: none;">
+                    </div>
+
+                    <!-- File Upload Status -->
+                    <div id="fileStatus" class="file-status" style="display: none;">
+                        <div id="fileStatusContent"></div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="divider-text">or paste below</div>
+
+                    <!-- Chat Input (Secondary) -->
+                    <form id="chatForm" class="chat-form landing-chat">
+                        <div class="chat-input-wrapper">
+                            <textarea
+                                id="chatInput"
+                                class="chat-input"
+                                placeholder="Paste your transcript or start asking questions..."
+                                rows="3"></textarea>
+                            <button type="submit" class="btn-send" aria-label="Send">→</button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider-text">Or try a demo</div>
+
+                    <!-- Demo Transcript Selector -->
+                    <div class="demo-selector">
+                        <label for="demoSelect" class="demo-label">Demo Transcripts (Prototype):</label>
+                        <select id="demoSelect" class="demo-dropdown">
+                            <option value="">Select a demo transcript...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State 2: Parse Confirmation -->
+            <div id="state-confirm" class="state">
+                <div class="confirm-container">
+                    <div class="confirm-card">
+                        <!-- Student Dashboard Header -->
+                        <div class="student-dashboard">
+                            <div class="dashboard-left">
+                                <h2 class="student-name" id="confirmName">Loading...</h2>
+                                <p class="student-meta" id="confirmMeta"></p>
+                            </div>
+                            <div class="dashboard-right">
+                                <div class="stat-box">
+                                    <div class="stat-label">GPA</div>
+                                    <div class="stat-value" id="confirmGPA">—</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Credits</div>
+                                    <div class="stat-value" id="confirmCredits">—</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">I-Core</div>
+                                    <div class="stat-value" id="confirmICoreValue">—</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div style="border-top: 1px solid var(--border-color); margin: 1.5rem 0;"></div>
+
+                        <!-- Courses List -->
+                        <div class="confirm-section">
+                            <h3 class="section-label">Courses Extracted</h3>
+                            <div id="confirmCoursesList" class="courses-grid"></div>
+                        </div>
+
+                        <!-- Warnings/Notes -->
+                        <div id="confirmWarnings" style="display: none;" class="confirm-section">
+                            <div class="warning-box" id="warningsContent"></div>
+                        </div>
+
+                        <!-- Edit Mode Section (shown when "Fix Something" is clicked) -->
+                        <div id="editMode" style="display: none;" class="confirm-section edit-mode-section">
+                            <h3 class="section-label">✏️ Edit Parsed Data</h3>
+                            <div class="profile-inputs">
+                                <div class="input-group">
+                                    <label for="editStudentName">Student Name</label>
+                                    <input
+                                        type="text"
+                                        id="editStudentName"
+                                        placeholder="Student name"
+                                        class="profile-input">
+                                </div>
+                                <div class="input-group">
+                                    <label for="editDeclaredMajors">Declared Majors (from transcript)</label>
+                                    <input
+                                        type="text"
+                                        id="editDeclaredMajors"
+                                        placeholder="e.g., Finance, Accounting"
+                                        class="profile-input">
+                                    <small>Format: Major1, Major2</small>
+                                </div>
+                                <div class="input-group">
+                                    <label for="editCareerGoal">Career Interest (from transcript)</label>
+                                    <input
+                                        type="text"
+                                        id="editCareerGoal"
+                                        placeholder="e.g., Investment banking"
+                                        class="profile-input">
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                                <button id="editCancel" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                                <button id="editSave" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                            </div>
+                        </div>
+
+                        <!-- Profile Info Section -->
+                        <div class="confirm-section">
+                            <h3 class="section-label">Your Academic Profile</h3>
+                            <div class="profile-inputs">
+                                <div class="input-group">
+                                    <label for="confirmMajorInput">Declared Major(s)</label>
+                                    <input
+                                        type="text"
+                                        id="confirmMajorInput"
+                                        placeholder="e.g., Finance, Accounting, Marketing"
+                                        class="profile-input">
+                                    <small>Format: Finance, Accounting, etc.</small>
+                                </div>
+                                <div class="input-group">
+                                    <label for="confirmInterestsInput">Career Interests</label>
+                                    <input
+                                        type="text"
+                                        id="confirmInterestsInput"
+                                        placeholder="e.g., Investment banking, FP&A"
+                                        class="profile-input">
+                                    <small>Optional: helps refine recommendations</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="confirm-actions">
+                            <button id="confirmEdit" class="btn btn-secondary">
+                                <span>✏️</span> Fix Something
+                            </button>
+                            <button id="confirmProceed" class="btn btn-primary">
+                                <span>→</span> Looks Good
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- State 3: Recommendations + Chat -->
+            <div id="state-chat" class="state">
+                <div class="chat-container">
+                    <!-- Student Profile Header (Sticky) -->
+                    <div class="profile-header">
+                        <div class="profile-header-content">
+                            <div>
+                                <div class="profile-name" id="profileName"></div>
+                                <div class="profile-details">
+                                    <span id="profileMajor" class="detail"></span>
+                                    <span id="profileICoreStatus" class="detail"></span>
+                                </div>
+                            </div>
+                            <button id="exitBtn" class="btn-exit" title="Return to upload" aria-label="Exit to home">↩️</button>
+                        </div>
+                    </div>
+
+                    <!-- Main Content: Recommendations (Left) + Chat (Right) -->
+                    <div class="chat-main-layout">
+                        <!-- Left Sidebar: Recommendations -->
+                        <aside class="recommendations-sidebar">
+                            <h2 class="sidebar-heading">Recommended Courses</h2>
+                            <div id="recommendationsList" class="recommendations-list"></div>
+                        </aside>
+
+                        <!-- Right: Chat Messages + Input -->
+                        <section class="chat-section">
+                            <!-- Chat Messages -->
+                            <div id="chatMessages" class="chat-messages">
+                                <!-- Messages appear here -->
+                            </div>
+
+                            <!-- Chat Input (Always Visible) -->
+                            <div class="chat-footer">
+                                <form id="chatFormMain" class="chat-form">
+                                    <div class="chat-input-wrapper">
+                                        <textarea
+                                            id="chatInputMain"
+                                            class="chat-input"
+                                            placeholder="Ask a follow-up question (e.g., 'What if I drop Marketing?' or 'Show me next year's plan')"
+                                            rows="1"></textarea>
+                                        <button type="submit" class="btn-send" aria-label="Send message">→</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

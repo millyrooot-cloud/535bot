@@ -1,0 +1,1205 @@
+/* ============================================================================
+   Kelley Compass AI - Single Screen, State-Based Design
+   ========================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --crimson: #990000;
+    --crimson-dark: #660000;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--gray-50);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ============================================================================
+   LAYOUT: HEADER + MAIN
+   ========================================================================== */
+
+.app-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-header {
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+}
+
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-section h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.logo-section p {
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
+
+.status-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.app-main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+}
+
+/* ============================================================================
+   STATE MANAGEMENT
+   ========================================================================== */
+
+.state {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.state.state-active {
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ============================================================================
+   STATE 1: LANDING
+   ========================================================================== */
+
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 3rem 2rem;
+    max-width: 700px;
+    margin: auto;
+}
+
+/* Demo Selector */
+.demo-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    opacity: 0.8;
+}
+
+.demo-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.demo-dropdown {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.demo-dropdown:hover {
+    border-color: var(--crimson);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.demo-dropdown:focus {
+    outline: 2px solid var(--crimson);
+    outline-offset: 0;
+}
+
+.demo-dropdown option {
+    padding: 0.3rem;
+}
+
+/* Drop Zone */
+.file-drop-zone {
+    cursor: pointer;
+    padding: 4rem 2rem;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(153, 0, 0, 0.02) 0%, rgba(153, 0, 0, 0.01) 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    position: relative;
+}
+
+.file-drop-zone:hover,
+.file-drop-zone.dragover {
+    border-color: var(--crimson);
+    background: rgba(153, 0, 0, 0.05);
+    box-shadow: var(--shadow);
+}
+
+.file-drop-zone:focus-visible {
+    outline: 2px solid var(--crimson);
+    outline-offset: 2px;
+}
+
+.file-drop-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    pointer-events: none;
+}
+
+.file-drop-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+}
+
+.file-drop-text {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.file-drop-hint {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.file-drop-zone.loading {
+    opacity: 0.7;
+    border-color: var(--crimson);
+    background: rgba(153, 0, 0, 0.1);
+    pointer-events: none;
+}
+
+.file-drop-zone.loading .file-drop-icon {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Divider */
+.divider-text {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Landing Chat (Secondary) */
+.landing-chat {
+    opacity: 0.7;
+}
+
+.landing-chat .chat-input {
+    min-height: 90px;
+    border-color: var(--gray-200);
+}
+
+/* ============================================================================
+   STATE 2: CONFIRMATION
+   ========================================================================== */
+
+.confirm-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    min-height: 100%;
+    overflow-y: auto;
+}
+
+.confirm-card {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* Student Dashboard */
+.student-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.student-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--crimson);
+    margin-bottom: 0.5rem;
+}
+
+.student-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.dashboard-right {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.stat-box {
+    background: var(--gray-50);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--crimson);
+}
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--crimson);
+}
+
+.confirm-section {
+    margin-bottom: 1.5rem;
+}
+
+/* Extra space before the Academic Profile section */
+.confirm-section:has(+ .confirm-section .section-label:contains("Your Academic Profile")) {
+    margin-bottom: 3rem;
+}
+
+/* Or use general spacing - increase top margin for any confirm-section after courses */
+.confirm-section:nth-of-type(3) {
+    margin-top: 2.5rem;
+}
+
+.section-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--crimson);
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+.profile-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+}
+
+.profile-input {
+    background: var(--gray-50);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-color: var(--crimson);
+    background: white;
+}
+
+.input-group small {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.3rem;
+}
+
+.courses-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: white;
+}
+
+.courses-term-header {
+    display: sticky;
+    top: 0;
+    background: linear-gradient(135deg, rgba(153, 0, 0, 0.1) 0%, rgba(153, 0, 0, 0.05) 100%);
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--crimson);
+    border-bottom: 1px solid var(--border-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.course-list-item {
+    display: grid;
+    grid-template-columns: 110px 1fr 60px;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    font-size: 0.9rem;
+    transition: background 0.2s ease;
+}
+
+.course-list-item:hover {
+    background: var(--gray-50);
+}
+
+.course-list-item:last-child {
+    border-bottom: none;
+}
+
+.course-list-code {
+    font-weight: 700;
+    color: var(--crimson);
+    font-size: 0.9rem;
+    min-width: 110px;
+}
+
+.course-list-title {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.course-list-grade {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+    min-width: 60px;
+}
+
+.warning-box {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    padding: 1rem;
+    border-radius: 6px;
+    color: #7f1d1d;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .student-dashboard {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .dashboard-right {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-box {
+        padding: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+}
+
+.confirm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.confirm-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.confirm-year {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.confirm-profile {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.confirm-icore {
+    background: #eff6ff;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    color: #1e40af;
+}
+
+.confirm-courses {
+    margin-bottom: 1.5rem;
+}
+
+.confirm-courses h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--crimson);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.course-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.course-list li {
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.course-list li:last-child {
+    border-bottom: none;
+}
+
+.confirm-stats {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.file-status {
+    padding: 1.25rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    animation: slideIn 0.3s ease-out;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.file-status.success {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    color: #065f46;
+    font-weight: 500;
+}
+
+.file-status.error {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    color: #7f1d1d;
+    font-weight: 500;
+}
+
+.file-status.warning {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    color: #92400e;
+    font-weight: 500;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+}
+
+/* Edit Mode */
+.edit-mode-section {
+    background: linear-gradient(135deg, rgba(153, 0, 0, 0.06) 0%, rgba(153, 0, 0, 0.02) 100%);
+    border: 1px solid rgba(153, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* ============================================================================
+   STATE 3: CHAT + RECOMMENDATIONS
+   ========================================================================== */
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Sidebar + Chat Layout */
+.chat-main-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1px;
+    flex: 1;
+    overflow: hidden;
+    background: var(--border-color);
+}
+
+/* Recommendations Sidebar (Left) */
+.recommendations-sidebar {
+    background: white;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1.5rem 1rem;
+}
+
+.sidebar-heading {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--crimson);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.recommendation-card {
+    background: var(--gray-50);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rec-code {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--crimson);
+    margin-bottom: 0.25rem;
+}
+
+.rec-title {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.rec-credits {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Chat Section (Right) */
+.chat-section {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+}
+
+/* Profile Header */
+.profile-header {
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--crimson);
+    margin-bottom: 0.75rem;
+}
+
+.profile-details {
+    display: flex;
+    gap: 2rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
+}
+
+.profile-details .detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Recommendations Section */
+.recommendations-section {
+    padding: 2rem;
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.section-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--crimson);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.recommendation-card {
+    background: var(--gray-50);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rec-code {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--crimson);
+}
+
+.rec-credits {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.rec-title {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.rec-reason {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.rec-prereq {
+    font-size: 0.85rem;
+    color: #059669;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rec-warning {
+    background: #fef2f2;
+    border-left: 3px solid #ef4444;
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #7f1d1d;
+    margin-top: 1rem;
+}
+
+/* Chat Messages */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background: white;
+    min-height: 0;
+}
+
+.message {
+    animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-content {
+    padding: 1.25rem;
+    border-radius: 8px;
+    max-width: 85%;
+}
+
+.message-user {
+    margin-left: auto;
+}
+
+.message-user .message-content {
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+    color: white;
+}
+
+.message-assistant {
+    margin-right: auto;
+}
+
+.message-assistant .message-content {
+    background: white;
+    border-left: 4px solid var(--crimson);
+    color: var(--text-primary);
+}
+
+.message-system .message-content {
+    background: white;
+    border: 1px solid var(--border-color);
+}
+
+/* Chat Footer */
+.chat-footer {
+    background: white;
+    border-top: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+    flex-shrink: 0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chat-form {
+    width: 100%;
+}
+
+.chat-input-wrapper {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.chat-input {
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: none;
+    min-height: 44px;
+    max-height: 150px;
+    background: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-input:focus {
+    outline: none;
+    border-color: var(--crimson);
+    box-shadow: 0 0 0 3px rgba(153, 0, 0, 0.08);
+}
+
+.chat-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.btn-send {
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.btn-send:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn-send:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn {
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+    color: white;
+    flex: 1;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--gray-100);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+}
+
+/* ============================================================================
+   SCROLLBAR
+   ========================================================================== */
+
+.chat-messages::-webkit-scrollbar,
+.course-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track,
+.course-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb,
+.course-list::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 4px;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .logo-section h1 {
+        font-size: 1.2rem;
+    }
+
+    .logo-section p {
+        font-size: 0.75rem;
+    }
+
+    .landing-container {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .file-drop-zone {
+        padding: 2rem 1rem;
+        min-height: 200px;
+    }
+
+    .confirm-container {
+        padding: 1rem;
+    }
+
+    .confirm-card {
+        padding: 1rem;
+        margin: 0;
+    }
+
+    .student-dashboard {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-right {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+
+    .stat-box {
+        padding: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.65rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .confirm-section {
+        margin-bottom: 1rem;
+    }
+
+    .profile-inputs {
+        gap: 0.75rem;
+    }
+
+    .input-group {
+        gap: 0.35rem;
+    }
+
+    .profile-input {
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+
+    .confirm-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .message-content {
+        max-width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .chat-container {
+        max-width: 100%;
+    }
+
+    .profile-header,
+    .recommendations-section,
+    .chat-footer {
+        padding: 0.75rem;
+    }
+
+    .chat-messages {
+        padding: 0.75rem;
+    }
+
+    .divider-text {
+        font-size: 0.85rem;
+    }
+
+    .demo-selector {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .demo-dropdown {
+        padding: 0.4rem 0.65rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Responsive for new sidebar layout */
+@media (max-width: 1024px) {
+    .chat-main-layout {
+        grid-template-columns: 250px 1fr;
+    }
+
+    .recommendations-sidebar {
+        padding: 1rem 0.75rem;
+    }
+
+    .sidebar-heading {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .recommendation-card {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .chat-main-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendations-sidebar {
+        display: none;
+    }
+
+    .profile-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .profile-name {
+        font-size: 1.1rem;
+    }
+
+    .profile-details {
+        gap: 1rem;
+        font-size: 0.85rem;
+    }
+
+    .chat-messages {
+        padding: 1.5rem 1rem;
+    }
+
+    .chat-footer {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirm-actions {
+        flex-direction: column;
+    }
+
+    .profile-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .file-drop-icon {
+        font-size: 2rem;
+    }
+
+    .file-drop-text {
+        font-size: 1rem;
+    }
+}

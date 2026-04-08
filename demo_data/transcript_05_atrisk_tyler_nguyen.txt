@@ -1,0 +1,90 @@
+========================================================
+     INDIANA UNIVERSITY BLOOMINGTON
+     OFFICE OF THE REGISTRAR
+     UNOFFICIAL ACADEMIC TRANSCRIPT
+========================================================
+
+Student Name:       Tyler Nguyen
+Student ID:         2023-061204
+Date of Birth:      08/17/2005
+Program:            Pre-Business (seeking Kelley admission)
+School:             College of Arts & Sciences (Pre-Business)
+Matriculation Term: Fall 2023
+Expected Graduation: May 2027 (may be delayed)
+Advisor:            AMES Pre-Business Advising Office
+
+========================================================
+  *** ADVISING FLAGS ON FILE ***
+  - One course withdrawal (W) recorded
+  - One grade below C in I-Core prerequisite
+  - Kelley admission: UNDER COMPREHENSIVE REVIEW
+========================================================
+
+ACADEMIC RECORD
+========================================================
+
+--- FALL 2023 ---
+
+ENG-W 131    English Composition                      3.0 cr    B
+BUS-C 104    Business Presentations                   3.0 cr    B-
+BUS-T 175    Kelley Compass 1                         1.5 cr    B+
+ECON-B 251   Fundamentals of Economics for Business I 3.0 cr    C+
+MATH-M 118   Finite Mathematics                       3.0 cr    W   ← WITHDRAWAL
+
+Semester Credits Attempted: 13.5
+Semester Credits Earned: 10.5
+Semester GPA: 2.80
+Cumulative Credits: 10.5   Cumulative GPA: 2.80
+
+--- SPRING 2024 ---
+
+MATH-M 118   Finite Mathematics (RETAKE)              3.0 cr    C+
+BUS-A 100    Introductory Accounting Principles       1.0 cr    B
+BUS-K 201    Foundations of Business Info Systems     3.0 cr    C
+BUS-C 204    Business Writing                         3.0 cr    B-
+BUS-L 201    Legal Environment of Business            3.0 cr    B-
+
+Semester Credits: 13.0   Semester GPA: 2.69
+Cumulative Credits: 23.5  Cumulative GPA: 2.75
+
+--- FALL 2024 ---
+
+BUS-A 304    Financial Reporting & Analysis           3.0 cr    D+  ← BELOW C, does NOT satisfy prereq
+BUS-G 202    Business, Government and Society         3.0 cr    B
+BUS-T 275    Kelley Compass 2                         1.5 cr    B+
+ECON-E 370   Statistical Analysis for Business        3.0 cr    C
+PSY-P 101    Introductory Psychology (GenEd)          3.0 cr    B+
+
+Semester Credits: 13.5   Semester GPA: 2.60
+Cumulative Credits: 37.0  Cumulative GPA: 2.70
+
+========================================================
+DEGREE PROGRESS NOTES
+========================================================
+
+- Kelley admission status: COMPREHENSIVE REVIEW (due to B- in BUS-C 104,
+  W in MATH-M 118, and D+ in BUS-A 304)
+- I-Core prerequisites completed WITH C or higher: 8 of 17
+- BUS-A 304: grade of D+ — DOES NOT satisfy prerequisite; must retake
+- BUS-A 306 not yet attempted (requires BUS-A 100 ✅, but A304 must be
+  retaken first before taking A306)
+- MATH-M 118 retake: C+ — satisfies degree requirement (pre-2024 bulletin)
+  but NOTE: student has TWO attempts on MATH-M 118 — flags auto-review
+- BUS-K 303 not yet taken (requires BUS-K 201 ✅ — can take next semester)
+- BUS-D 270 not yet taken
+- BUS-D 271 not yet taken
+
+========================================================
+DECLARED INTERESTS (per advising notes)
+========================================================
+
+Intended Major:     Management
+Possible Co-Major:  None declared yet
+Career Interest:    Human resources, consulting
+Credit Hours Goal:  14 per semester (managing workload)
+Honors Program:     No
+Notes:              Student requests help getting back on track and
+                    understanding realistic graduation timeline
+========================================================
+END OF TRANSCRIPT
+========================================================

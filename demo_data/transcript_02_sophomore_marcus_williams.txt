@@ -1,0 +1,79 @@
+========================================================
+     INDIANA UNIVERSITY BLOOMINGTON
+     OFFICE OF THE REGISTRAR
+     UNOFFICIAL ACADEMIC TRANSCRIPT
+========================================================
+
+Student Name:       Marcus Williams
+Student ID:         2023-054892
+Date of Birth:      03/22/2005
+Program:            Bachelor of Science in Business
+School:             Kelley School of Business
+Matriculation Term: Fall 2023
+Expected Graduation: May 2027
+Advisor:            Kelley Undergraduate Advising
+
+========================================================
+ACADEMIC RECORD
+========================================================
+
+--- FALL 2023 ---
+
+ENG-W 131    English Composition                      3.0 cr    B+
+BUS-C 104    Business Presentations                   3.0 cr    A
+BUS-T 175    Kelley Compass 1                         1.5 cr    A
+ECON-B 251   Fundamentals of Economics for Business I 3.0 cr    B+
+MATH-M 118   Finite Mathematics                       3.0 cr    B
+
+Semester Credits: 13.5   Semester GPA: 3.33
+Cumulative Credits: 13.5  Cumulative GPA: 3.33
+
+--- SPRING 2024 ---
+
+BUS-A 100    Introductory Accounting Principles       1.0 cr    A
+BUS-K 201    Foundations of Business Info Systems     3.0 cr    B+
+BUS-C 204    Business Writing                         3.0 cr    B+
+BUS-L 201    Legal Environment of Business            3.0 cr    A-
+BUS-D 270    The Global Business Environments         1.5 cr    B+
+GEOG-G 110   Human Geography (GenEd: S&H)             3.0 cr    B
+
+Semester Credits: 14.5   Semester GPA: 3.40
+Cumulative Credits: 28.0  Cumulative GPA: 3.37
+
+--- FALL 2024 ---
+
+BUS-A 304    Financial Reporting & Analysis           3.0 cr    B
+BUS-A 306    Management Accounting & Analysis         3.0 cr    B-
+BUS-T 275    Kelley Compass 2                         1.5 cr    A
+BUS-G 202    Business, Government and Society         3.0 cr    B+
+BUS-K 303    Technology & Business Analysis           3.0 cr    A-
+
+Semester Credits: 13.5   Semester GPA: 3.20
+Cumulative Credits: 41.5  Cumulative GPA: 3.31
+
+========================================================
+DEGREE PROGRESS NOTES
+========================================================
+
+- Admitted to Kelley School of Business: Spring 2024
+- I-Core prerequisites completed: 14 of 17
+- Remaining I-Core prereqs needed:
+    * ECON-E 370 or STAT-S 301 (Statistics)
+    * BUS-D 271 (Global Business Analysis) — prereq BUS-D 270 DONE
+    * BUS-T 275 DONE this semester
+- I-Core NOT yet started
+- Note: Matriculated Fall 2023, so MATH-M 118 counts toward degree
+  (pre-2024 bulletin rules apply)
+
+========================================================
+DECLARED INTERESTS (per advising notes)
+========================================================
+
+Declared Major:     Marketing
+Possible Co-Major:  Digital & Social Media Business Applications
+Career Interest:    Brand management, consumer marketing
+Credit Hours Goal:  15 per semester
+Honors Program:     No
+========================================================
+END OF TRANSCRIPT
+========================================================
