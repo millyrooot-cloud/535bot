@@ -1247,9 +1247,10 @@ COMPLETED COURSES:
 GUIDELINES:
 - Answer thoroughly with context and explanation
 - Reference their specific courses and grades when relevant
+- ALWAYS include full course names when mentioning courses (e.g., "BUS-F 303 (Corporate Finance)" not just "BUS-F 303")
 - For course questions: Describe what the course covers and why it matters
 - For requirement questions: Explain prerequisites, sequencing, and major impact
-- For "what should I take?": Give detailed reasoning for each recommendation
+- For "what should I take?": Give detailed reasoning for each recommendation with course titles
 - Use Kelley Compass AI system.md knowledge to provide accurate information
 """.format(
                 student=profile.get("student_name", "Student"),
