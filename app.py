@@ -1296,8 +1296,8 @@ GUIDELINES:
 
             try:
                 # Use unified AI call (Gemini first, Groq fallback)
-                # Increased max_tokens to 550 to allow detailed, specific responses
-                result = call_ai(system_prompt_text, user_prompt_text, max_tokens=550)
+                # Increased max_tokens to 1000 for Gemini (no rate limits like Groq)
+                result = call_ai(system_prompt_text, user_prompt_text, max_tokens=1000)
                 reply = result["reply"]
                 model_used = result["model"]
 
