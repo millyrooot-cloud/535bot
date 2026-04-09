@@ -595,9 +595,9 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
     # Try Gemini FIRST with SHORT timeout (4s)
     if GEMINI_AVAILABLE and GEMINI_API_KEY:
         gemini_models = [
-            "gemini-1.5-pro",      # Try this first
-            "gemini-2.0-flash",    # Then this
-            "gemini-pro-vision",   # Then this
+            "gemini-2.5-flash",        # Try this first (free tier)
+            "gemini-2.5-flash-lite",   # Then this (free tier)
+            "gemini-1.5-flash",        # Then this (free tier)
         ]
 
         for model_name in gemini_models:
