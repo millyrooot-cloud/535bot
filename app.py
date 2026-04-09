@@ -1301,6 +1301,19 @@ GUIDELINES:
                 reply = result["reply"]
                 model_used = result["model"]
 
+                # Extract recommendations from the AI reply
+                recommendations = extract_recommendations(reply)
+
+                # Build profile for frontend display
+                frontend_profile = {
+                    "student_name": profile.get("student_name", "Student"),
+                    "declared_majors": profile.get("declared_majors", []),
+                    "gpa": profile.get("gpa"),
+                    "total_credits": profile.get("total_credits"),
+                    "icore_percent": icore_percent,
+                    "career_interests": profile.get("career_interests")
+                }
+
                 # Store in conversation history
                 session["conversation_history"].append({
                     "role": "user",
@@ -1314,6 +1327,9 @@ GUIDELINES:
                 return jsonify({
                     "reply": reply,
                     "model": model_used,
+                    "profile": frontend_profile,
+                    "recommendations": recommendations,
+                    "icore_percent": icore_percent,
                     "is_analysis": False
                 })
             except Exception as e:

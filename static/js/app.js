@@ -530,10 +530,16 @@ confirmProceed.addEventListener('click', async () => {
 
         if (response.ok) {
             const data = await response.json();
-            if (data.recommendations) {
+
+            // Update recommendations from backend (should include parsed course recommendations)
+            if (data.recommendations && data.recommendations.length > 0) {
                 recommendations = data.recommendations;
+                console.log('[RECS] Got recommendations from backend:', recommendations.length);
+            } else {
+                console.log('[RECS] No recommendations from backend, keeping existing:', recommendations.length);
             }
-            // Store profile from API response if available
+
+            // Store profile from API response (has icore_percent calculated by backend)
             if (data.profile) {
                 window.lastApiProfile = data.profile;
                 console.log('[PROFILE] Received from API:', data.profile);
@@ -545,12 +551,13 @@ confirmProceed.addEventListener('click', async () => {
 
     isLoading = false;
 
-    // Show recommendations and move to chat state
+    // Show recommendations with updated data
     showRecommendations(parsedProfile, recommendations);
 
-    // Update parsedProfile with profile data from API if available (has icore_percent calc'd by backend)
+    // Update parsedProfile with enriched data from backend
     if (typeof window.lastApiProfile !== 'undefined') {
         parsedProfile = { ...parsedProfile, ...window.lastApiProfile };
+        console.log('[PROFILE] Updated profile to:', parsedProfile);
     }
 
     showProfileHeader(parsedProfile);
