@@ -30,6 +30,7 @@ load_dotenv(BASE_DIR / ".env.local")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+GROQ_API_KEY_2 = os.getenv("GROQ_API_KEY_2", "").strip()  # Fallback Groq key
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
 
@@ -636,10 +637,18 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
         except Exception as e:
             print(f"[AI] Gemini setup error: {type(e).__name__}: {e}")
 
-    # Fallback to Groq
-    if GROQ_API_KEY:
+    # Fallback to Groq (try both keys if needed)
+    groq_keys = [
+        ("Key 1", GROQ_API_KEY),
+        ("Key 2", GROQ_API_KEY_2)
+    ]
+
+    for key_name, groq_key in groq_keys:
+        if not groq_key:
+            continue
+
         try:
-            print(f"[AI] Attempting Groq...")
+            print(f"[AI] Attempting Groq ({key_name})...")
             groq_payload = {
                 "model": GROQ_MODEL,
                 "messages": [
@@ -650,21 +659,24 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
                 "max_tokens": max_tokens,
             }
 
-            print(f"[AI] Sending to Groq (payload: {len(str(groq_payload))} chars)...")
+            print(f"[AI] Sending to Groq {key_name} (payload: {len(str(groq_payload))} chars)...")
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Authorization": f"Bearer {groq_key}",
                     "Content-Type": "application/json",
                 },
                 json=groq_payload,
                 timeout=10,
             )
 
-            print(f"[AI] Groq response status: {response.status_code}")
+            print(f"[AI] Groq {key_name} response status: {response.status_code}")
 
             if response.status_code != 200:
-                print(f"[AI] Groq error response: {response.text[:500]}")
+                print(f"[AI] Groq {key_name} error response: {response.text[:500]}")
+                if response.status_code == 429:
+                    print(f"[AI] {key_name} rate limited - trying next key...")
+                    continue
 
             response.raise_for_status()
 
@@ -673,29 +685,31 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
 
             if result["reply"]:
                 result["model"] = f"Groq {GROQ_MODEL}"
-                print(f"[AI] SUCCESS: Groq returned {len(result['reply'])} chars")
+                print(f"[AI] SUCCESS: Groq {key_name} returned {len(result['reply'])} chars")
                 print("="*80 + "\n")
                 return result
             else:
-                print(f"[AI] Groq returned empty response")
+                print(f"[AI] Groq {key_name} returned empty response")
 
         except requests.exceptions.Timeout:
-            print(f"[AI] Groq: TIMEOUT (>10s)")
+            print(f"[AI] Groq {key_name}: TIMEOUT (>10s)")
         except requests.exceptions.RequestException as e:
             error_text = str(e)
-            print(f"[AI] Groq: REQUEST ERROR: {error_text[:200]}")
+            print(f"[AI] Groq {key_name}: REQUEST ERROR: {error_text[:200]}")
             if "429" in error_text or "rate" in error_text.lower():
-                print(f"[AI] Rate limit hit - will retry after brief delay")
+                print(f"[AI] {key_name} rate limited - trying next key...")
+                continue
         except Exception as e:
-            print(f"[AI] Groq: EXCEPTION: {type(e).__name__}: {e}")
+            print(f"[AI] Groq {key_name}: EXCEPTION: {type(e).__name__}: {e}")
 
     # All failed
     print(f"[AI] FAILED: All AI services unavailable")
-    print(f"[AI] GROQ_KEY valid: {bool(GROQ_API_KEY)}")
     print(f"[AI] GEMINI available: {GEMINI_AVAILABLE}, key valid: {bool(GEMINI_API_KEY)}")
+    print(f"[AI] GROQ_KEY_1 valid: {bool(GROQ_API_KEY)}")
+    print(f"[AI] GROQ_KEY_2 valid: {bool(GROQ_API_KEY_2)}")
     print("="*80 + "\n")
 
-    result["reply"] = "AI temporarily unavailable - rate limit or connection issue. Try again in 30s or upgrade Groq plan."
+    result["reply"] = "AI temporarily unavailable - rate limit reached on all Groq accounts. Try again in 30 minutes."
     result["model"] = "none"
 
     return result
