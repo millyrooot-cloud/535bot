@@ -603,9 +603,11 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
             try:
                 print(f"[AI] Attempting Gemini ({model_name}, 4s timeout)...")
                 genai.configure(api_key=GEMINI_API_KEY)
-                model = genai.GenerativeModel(model_name)
-
-                full_prompt = f"{enhanced_system}\n\n{user_prompt}"
+                # Use system_instruction for proper system prompt support (like Groq)
+                model = genai.GenerativeModel(
+                    model_name,
+                    system_instruction=enhanced_system
+                )
 
                 gemini_result = {"response": None, "error": None}
 
@@ -613,7 +615,7 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
                     try:
                         print(f"[AI] Gemini thread: calling generate_content...")
                         response = model.generate_content(
-                            full_prompt,
+                            user_prompt,  # Just user prompt - system is now in system_instruction
                             generation_config=genai.types.GenerationConfig(
                                 max_output_tokens=max_tokens,
                                 temperature=0.5,
@@ -789,32 +791,21 @@ def call_groq(profile: dict, parsed_transcript: dict) -> dict:
     print(f"[GROQ] Risks: {risk_flags}\n")
 
     system_prompt = f"""You are Kelley Compass AI, an expert academic advisor at IU Kelley.
+Answer concisely and directly. NO greetings or preambles.
 
 STUDENT: {student_status}
 - Major(s): {majors_str}
 - GPA: {gpa or 'N/A'} | Credits: {total_credits} | I-Core: {icore_percent:.0f}%
-- Goal: {career_interests or 'Not specified'}
-- Graduating: {grad_year}
-{f'- ALERTS: {risk_alert}' if risk_alert else ''}
+- Career goal: {career_interests or 'Not specified'}
 
-CONTEXT: {status_detail}
+TASK: List 3-5 recommended courses. Be specific and practical.
 
-TASK: Recommend 3-5 specific next courses. PROVIDE DETAILED EXPLANATIONS (not one sentence).
-
-IMPORTANT - DETAILED RESPONSES REQUIRED:
-- Always include the FULL COURSE NAME alongside the code (e.g., "BUS-F 303 (Corporate Finance)")
-- Explain WHAT each course covers (2-3 sentence description)
-- Explain WHY it's needed (prerequisites, major requirements, career goal alignment)
-- Reference their specific transcript when possible
-- Be conversational but informative
-
-RULES:
-1. NO courses already completed
-2. NO I-Core if complete
-3. ONLY major requirements if student has declared major
-4. Must provide substantial explanation for each course
-5. NO vague phrases like "and other requirements"
-6. ALWAYS include course titles - never list codes alone
+GUIDELINES:
+- Always use FULL course names: "BUS-F 303 (Corporate Finance)" not just "BUS-F 303"
+- Give 1-2 sentence explanation per course (WHY they need it)
+- No vague phrases like "and other requirements"
+- No courses already completed
+- Only major requirements if major is declared, skip I-Core if 50%+ complete
 
 FORMAT EXAMPLE:
 BUS-F 303 (Corporate Finance) — This course covers valuation methods, capital structure, and financial decision-making. You need this because it's required for the Finance major and foundational before advanced finance courses. Credits: 3
@@ -1273,7 +1264,7 @@ def chat():
             # Build system prompt with detailed context
             system_prompt_text = """You are Kelley Compass AI, an expert academic advisor for Indiana University's Kelley School of Business.
 
-Answer the student's question with specific details and relevant context from their transcript.
+Answer student questions directly and concisely. NO greetings, preambles, or introductions.
 
 STUDENT: {student}
 MAJOR(S): {majors}
@@ -1286,14 +1277,12 @@ COMPLETED COURSES:
 {completed}
 
 GUIDELINES:
-- Be specific: explain WHY each recommendation matters
-- Include full course titles (e.g., "BUS-F 303 (Corporate Finance)")
-- For course recommendations: mention prerequisites, course content, and how it fits their path
-- For "what to take?": Give 4-5 courses with brief reasoning (1-2 sentences per course)
-- Reference their actual grades and transcript when relevant
-- Mention course sequencing or prerequisites if they matter
-- Use Kelley Compass AI system.md knowledge to provide accurate information
-- Goal: Help them understand their options, not just give a list
+- Answer directly: 2-3 sentences per recommendation maximum
+- Always include full course titles (e.g., "BUS-F 303 (Corporate Finance)")
+- Explain WHY each course matters (1-2 sentences)
+- For "what to take?": List 3-5 courses with brief reason per course
+- Reference their transcript only when directly relevant
+- NO generic phrases like "this is a great course" - be specific
 """.format(
                 student=profile.get("student_name", "Student"),
                 majors=majors_str,
