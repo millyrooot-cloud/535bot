@@ -33,6 +33,9 @@ const recommendationsList = document.getElementById('recommendationsList');
 
 // Demo selector
 const demoSelect = document.getElementById('demoSelect');
+const previewDemoBtn = document.getElementById('previewDemoBtn');
+const previewModal = document.getElementById('previewModal');
+const previewBody = document.getElementById('previewBody');
 
 // ============================================================================
 // DEMO TRANSCRIPT LOADING
@@ -79,9 +82,48 @@ async function loadDemo(demoId) {
 
         // Reset dropdown
         demoSelect.value = '';
+        previewDemoBtn.disabled = true;
     } catch (error) {
         console.error('Failed to load demo:', error);
         showFileStatus('error', 'Failed to load demo transcript');
+    }
+}
+
+// Preview demo transcript
+async function previewDemo() {
+    const demoId = demoSelect.value;
+    if (!demoId) return;
+
+    try {
+        previewBody.innerHTML = '<p>Loading preview...</p>';
+        previewModal.style.display = 'flex';
+
+        const response = await fetch(`/api/load-demo/${demoId}`);
+        const data = await response.json();
+
+        if (data.error) {
+            previewBody.innerHTML = `<p style="color: #990000;">Error: ${data.error}</p>`;
+            return;
+        }
+
+        previewBody.textContent = data.transcript_text;
+    } catch (error) {
+        console.error('Failed to load preview:', error);
+        previewBody.innerHTML = `<p style="color: #990000;">Failed to load preview</p>`;
+    }
+}
+
+// Close preview modal
+function closePreview() {
+    previewModal.style.display = 'none';
+}
+
+// Load selected demo and close preview
+function loadSelectedDemo() {
+    const demoId = demoSelect.value;
+    closePreview();
+    if (demoId) {
+        loadDemo(demoId);
     }
 }
 
@@ -89,7 +131,23 @@ async function loadDemo(demoId) {
 if (demoSelect) {
     demoSelect.addEventListener('change', (e) => {
         if (e.target.value) {
-            loadDemo(e.target.value);
+            previewDemoBtn.disabled = false;
+        } else {
+            previewDemoBtn.disabled = true;
+        }
+    });
+}
+
+// Preview button event listener
+if (previewDemoBtn) {
+    previewDemoBtn.addEventListener('click', previewDemo);
+}
+
+// Close modal when clicking outside of it
+if (previewModal) {
+    previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) {
+            closePreview();
         }
     });
 }

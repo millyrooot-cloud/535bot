@@ -70,9 +70,29 @@
                     <!-- Demo Transcript Selector -->
                     <div class="demo-selector">
                         <label for="demoSelect" class="demo-label">Demo Transcripts (Prototype):</label>
-                        <select id="demoSelect" class="demo-dropdown">
-                            <option value="">Select a demo transcript...</option>
-                        </select>
+                        <div class="demo-controls">
+                            <select id="demoSelect" class="demo-dropdown">
+                                <option value="">Select a demo transcript...</option>
+                            </select>
+                            <button id="previewDemoBtn" class="preview-btn" disabled>Preview</button>
+                        </div>
+                    </div>
+
+                    <!-- Demo Preview Modal -->
+                    <div id="previewModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="previewTitle">Demo Transcript Preview</h3>
+                                <button class="modal-close" onclick="closePreview()">&times;</button>
+                            </div>
+                            <div id="previewBody" class="modal-body">
+                                <p>Loading preview...</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn-secondary" onclick="closePreview()">Close</button>
+                                <button id="loadDemoBtn" class="btn-primary" onclick="loadSelectedDemo()">Load this demo</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
