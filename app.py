@@ -31,6 +31,7 @@ load_dotenv(BASE_DIR / ".env.local")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 GROQ_API_KEY_2 = os.getenv("GROQ_API_KEY_2", "").strip()  # Fallback Groq key
+GROQ_API_KEY_3 = os.getenv("GROQ_API_KEY3", "").strip()   # Second fallback Groq key
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
 
@@ -576,6 +577,7 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
     print(f"[AI] GEMINI_API_KEY present: {bool(GEMINI_API_KEY)}")
     print(f"[AI] GROQ_API_KEY_1 present: {bool(GROQ_API_KEY)}")
     print(f"[AI] GROQ_API_KEY_2 present: {bool(GROQ_API_KEY_2)}")
+    print(f"[AI] GROQ_API_KEY_3 present: {bool(GROQ_API_KEY_3)}")
     print(f"[AI] RAG_CONTEXT loaded: {bool(RAG_CONTEXT)} ({len(RAG_CONTEXT)} chars)")
     print("="*80 + "\n")
 
@@ -651,10 +653,11 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
 
         print(f"[AI] All Gemini models exhausted - falling back to Groq")
 
-    # Fallback to Groq (try both keys if needed)
+    # Fallback to Groq (try all three keys if needed)
     groq_keys = [
         ("Key 1", GROQ_API_KEY),
-        ("Key 2", GROQ_API_KEY_2)
+        ("Key 2", GROQ_API_KEY_2),
+        ("Key 3", GROQ_API_KEY_3)
     ]
 
     for key_name, groq_key in groq_keys:
@@ -721,6 +724,7 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
     print(f"[AI] GEMINI available: {GEMINI_AVAILABLE}, key valid: {bool(GEMINI_API_KEY)}")
     print(f"[AI] GROQ_KEY_1 valid: {bool(GROQ_API_KEY)}")
     print(f"[AI] GROQ_KEY_2 valid: {bool(GROQ_API_KEY_2)}")
+    print(f"[AI] GROQ_KEY_3 valid: {bool(GROQ_API_KEY_3)}")
     print("="*80 + "\n")
 
     result["reply"] = "AI temporarily unavailable - all services rate limited or unavailable. Try again in 30+ minutes."
