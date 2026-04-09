@@ -577,22 +577,66 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
     print(f"[AI] RAG_CONTEXT loaded: {bool(RAG_CONTEXT)} ({len(RAG_CONTEXT)} chars)")
     print("="*80 + "\n")
 
-    # Enhance system prompt with RAG context (system.md is already optimized ~1,800 tokens)
+    # Enhance system prompt with RAG context if available
     enhanced_system = system_prompt
     if RAG_CONTEXT:
-        # IMPORTANT: Put specific system_prompt FIRST (has student context), then append general curriculum
-        # This ensures student-specific instructions take priority over generic curriculum
-        if system_prompt.strip() and system_prompt != "You are an AI assistant.":
-            enhanced_system = f"{system_prompt}\n\n---\nREFERENCE CURRICULUM:\n{RAG_CONTEXT}"
-            print(f"[AI] Enhanced prompt: student context first, then curriculum reference")
-        else:
-            # Fallback: just use system.md if no specific context provided
-            enhanced_system = RAG_CONTEXT
-            print(f"[AI] Using system.md (no specific student context)")
+        # Use first 5KB only to minimize token usage (was 10KB)
+        # This is ~1,200 tokens - keeps each call under 4,000 tokens total
+        rag_core = RAG_CONTEXT[:5000]
+        enhanced_system = f"{system_prompt}\n\n---\nKELLEY CURRICULUM:\n{rag_core}"
+        print(f"[AI] RAG context attached: {len(rag_core)} chars (from {len(RAG_CONTEXT)} total)")
     else:
-        print(f"[AI] WARNING: No RAG context available, using user prompt only")
+        print(f"[AI] WARNING: No RAG context available")
 
-    # Try Groq FIRST (more reliable than Gemini for this use case)
+    # Try Gemini FIRST with SHORT timeout (4s)
+    if GEMINI_AVAILABLE and GEMINI_API_KEY:
+        try:
+            print(f"[AI] Attempting Gemini (4s timeout)...")
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+
+            full_prompt = f"{enhanced_system}\n\n{user_prompt}"
+
+            gemini_result = {"response": None, "error": None}
+
+            def call_gemini():
+                try:
+                    print(f"[AI] Gemini thread: calling generate_content...")
+                    response = model.generate_content(
+                        full_prompt,
+                        generation_config=genai.types.GenerationConfig(
+                            max_output_tokens=max_tokens,
+                            temperature=0.5,
+                        )
+                    )
+                    if response and response.text:
+                        gemini_result["response"] = response.text
+                        print(f"[AI] Gemini thread: got {len(response.text)} chars")
+                    else:
+                        gemini_result["error"] = "Empty response"
+                except Exception as e:
+                    gemini_result["error"] = str(e)
+                    print(f"[AI] Gemini thread error: {e}")
+
+            thread = threading.Thread(target=call_gemini, daemon=False)
+            thread.start()
+            thread.join(timeout=4.0)  # Short timeout: 4 seconds
+
+            if gemini_result["response"]:
+                result["reply"] = gemini_result["response"]
+                result["model"] = "Gemini 1.5 Flash"
+                print(f"[AI] SUCCESS: Gemini returned in time")
+                print("="*80 + "\n")
+                return result
+            elif thread.is_alive():
+                print(f"[AI] Gemini: TIMEOUT (>4s) - falling back to Groq")
+            else:
+                print(f"[AI] Gemini failed: {gemini_result.get('error', 'unknown')}")
+
+        except Exception as e:
+            print(f"[AI] Gemini setup error: {type(e).__name__}: {e}")
+
+    # Fallback to Groq
     if GROQ_API_KEY:
         try:
             print(f"[AI] Attempting Groq...")
@@ -644,54 +688,6 @@ def call_ai(system_prompt: str, user_prompt: str, max_tokens: int = 800) -> dict
                 print(f"[AI] Rate limit hit - will retry after brief delay")
         except Exception as e:
             print(f"[AI] Groq: EXCEPTION: {type(e).__name__}: {e}")
-
-    # Fallback to Gemini if Groq fails
-    if GEMINI_AVAILABLE and GEMINI_API_KEY:
-        try:
-            print(f"[AI] Attempting Gemini as fallback...")
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-1.5-flash')
-
-            full_prompt = f"{enhanced_system}\n\n{user_prompt}"
-
-            gemini_result = {"response": None, "error": None}
-
-            def call_gemini():
-                try:
-                    print(f"[AI] Gemini thread: calling generate_content...")
-                    response = model.generate_content(
-                        full_prompt,
-                        generation_config=genai.types.GenerationConfig(
-                            max_output_tokens=max_tokens,
-                            temperature=0.5,
-                        )
-                    )
-                    if response and response.text:
-                        gemini_result["response"] = response.text
-                        print(f"[AI] Gemini thread: got {len(response.text)} chars")
-                    else:
-                        gemini_result["error"] = "Empty response"
-                except Exception as e:
-                    gemini_result["error"] = str(e)
-                    print(f"[AI] Gemini thread error: {e}")
-
-            thread = threading.Thread(target=call_gemini, daemon=False)
-            thread.start()
-            thread.join(timeout=6.0)
-
-            if gemini_result["response"]:
-                result["reply"] = gemini_result["response"]
-                result["model"] = "Gemini 1.5 Flash"
-                print(f"[AI] SUCCESS: Gemini returned in time")
-                print("="*80 + "\n")
-                return result
-            elif thread.is_alive():
-                print(f"[AI] Gemini: TIMEOUT (>6s)")
-            else:
-                print(f"[AI] Gemini failed: {gemini_result.get('error', 'unknown')}")
-
-        except Exception as e:
-            print(f"[AI] Gemini setup error: {type(e).__name__}: {e}")
 
     # All failed
     print(f"[AI] FAILED: All AI services unavailable")
